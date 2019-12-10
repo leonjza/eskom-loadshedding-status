@@ -1,0 +1,10 @@
+version: "3"
+services:
+    loadsheddingstatus:
+    build:
+      context: https://github.com/leonjza/eskom-loadshedding-status.git
+      dockerfile: Dockerfile
+    image: loadsheddingstatus:local
+    command: -t '<notifier>' poll
+    container_name: loadsheddingstatus
+    restart: unless-stopped
