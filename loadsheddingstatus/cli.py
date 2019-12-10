@@ -15,7 +15,7 @@ class Configuration:
     """
 
     endpoint: str = 'http://loadshedding.eskom.co.za/LoadShedding/GetStatus'
-    last_status: str = '1'
+    last_status: str = None
 
 
 c = Configuration()
