@@ -66,7 +66,7 @@ def poll(sleep):
 
     while True:
         try:
-            r = requests.get(c.endpoint)
+            r = requests.get(c.endpoint, timeout=15)
             log.info(f'The endpoint {c.endpoint} responded with {r.text}')
 
             if c.last_status is None:
