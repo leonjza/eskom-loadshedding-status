@@ -50,7 +50,10 @@ def ping():
     log.info(f'Checking out {c.endpoint}...')
     try:
         r = requests.get(c.endpoint)
-        log.info(f'The endpoint responded with {r.text}')
+        status = int(r.text)
+        log.info(f'The endpoint responded with {status}')
+    except ValueError as e:
+        log.error(f'Could not convert response value of {r.text} to int: {e}')
     except requests.exceptions.ConnectionError as e:
         log.error(f'Request failed with {e}')
     except Exception as e:
@@ -67,20 +70,27 @@ def poll(sleep):
     while True:
         try:
             r = requests.get(c.endpoint, timeout=15)
-            log.info(f'The endpoint {c.endpoint} responded with {r.text}')
+            status = int(r.text)
+            log.info(f'The endpoint {c.endpoint} responded with {status}')
 
-            if c.last_status is None:
-                c.last_status = r.text
+            # sometimes this thing responds with a -1, derp.
+            if status == -1:
+                log.info('Ignoring a response of -1')
                 continue
 
-            if c.last_status != r.text:
+            if c.last_status is None:
+                c.last_status = status
+                continue
+
+            if c.last_status != status:
                 apobj.notify(
-                    body=f'Eskom loadshedding stage update: {c.last_status} => {r.text}',
+                    body=f'Eskom loadshedding stage update: {c.last_status} => {status}',
                     title='Loadshedding update'
                 )
 
-                c.last_status = r.text
-
+                c.last_status = status
+        except ValueError as e:
+            log.error(f'Could not convert response value of {r.text} to int: {e}')
         except requests.exceptions.ConnectionError as e:
             log.error(f'Request failed with {e}')
         except Exception as e:
